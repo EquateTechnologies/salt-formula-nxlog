@@ -14,28 +14,31 @@ nxlog:
     sections:
       Extension:
         _syslog:
-          Module: xm_syslog
+          - Module: xm_syslog
       Input:
         in1:
-          Module: im_udp
-          Port: 514
-          Exec:
-            - 'parse_syslog_bsd()'
+          - Module: im_udp
+          - Port: 514
+          - Exec: 'parse_syslog()'
         in2:
-          Module: im_tcp
-          Port: 514
+          - Module: im_tcp
+          - Port: 514
+      Processor:
+        buffer:
+          - Module: pm_buffer
+          - MaxSize: 102400
+          - Type: disk
       Output:
         fileout1:
-          Module: om_file
-          File: '"/var/log/logmsg.txt"'
-          Exec:
-            - 'if $Message =~ /error/ $SeverityValue = syslog_severity_value("error")'
-            - 'to_syslog_bsd()'
+          - Module: om_file
+          - File: '"/tmp/logmsg.txt"'
+          - Exec: 'if $Message =~ /error/ $SeverityValue = syslog_severity_value("error")'
+          - Exec: 'to_syslog_bsd()'
         fileout2:
-          Module: om_file
-          File: '"/var/log/logmsg2.txt"'
+          - Module: om_file
+          - File: '"/tmp/logmsg2.txt"'
       Route:
         1:
-          Path: 'in1 => fileout1'
+          - Path: 'in1 => fileout1'
         tcproute:
-          Path: 'in2 => fileout2'
+          - Path: 'in2 => fileout2'
