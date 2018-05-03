@@ -1,0 +1,10 @@
+nxlog:
+  lookup:
+    pkg: nxlog-ce
+    service: nxlog
+    user: nxlog
+    group: nxlog
+  install_from_package_source: True
+  config:
+    global:
+      - LogLevel: INFO

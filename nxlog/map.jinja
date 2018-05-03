@@ -1,10 +1,65 @@
-{% set nxlog_map = salt['grains.filter_by']({
+{% import_yaml 'nxlog/defaults.yaml' as default_settings %}
+
+{% set os_map = salt['grains.filter_by']({
     'default': {
-        'pkg': 'nxlog-ce',
-        'service': 'nxlog',
-        'source': 'https://nxlog.co/system/files/products/files/348/nxlog-ce-2.9.1716-1_rhel7.x86_64.rpm'
+      'package': 'nxlog-ce',
+      'packages': [ 'libdbi' ],
+      'service': 'nxlog',
+      'package_source': 'https://nxlog.co/system/files/products/files/348/nxlog-ce-2.9.1716-1_rhel6.x86_64.rpm',
+      'log_file': '/var/log/nxlog/nxlog.log',
+      'user': 'nxlog',
+      'group': 'nxlog',
+      'locations': {
+        'config_file': '/etc/nxlog.conf',
+        'log_file': '/var/log/nxlog/nxlog.log',
+      },
     },
-},
-merge=salt['pillar.get']('nxlog:lookup', {}),
-default='default')
+    'Debian': {
+      'package': 'nxlog-ce',
+      'packages': [ 'libdbi' ],
+      'service': 'nxlog',
+      'package_source': 'https://nxlog.co/system/files/products/files/348/nxlog-ce_2.9.1716_debian_jessie_amd64.deb',
+      'log_file': '/var/log/nxlog/nxlog.log',
+      'user': 'nxlog',
+      'group': 'nxlog',
+      'locations': {
+        'config_file': '/etc/nxlog.conf',
+        'log_file': '/var/log/nxlog/nxlog.log',
+      },
+    },
+    'Ubuntu': {
+      'package': 'nxlog-ce',
+      'packages': [ 'libdbi' ],
+      'service': 'nxlog',
+      'package_source': 'https://nxlog.co/system/files/products/files/348/nxlog-ce_2.9.1716_ubuntu_1604_amd64.deb',
+      'log_file': '/var/log/nxlog/nxlog.log',
+      'user': 'nxlog',
+      'group': 'nxlog',
+      'locations': {
+        'config_file': '/etc/nxlog.conf',
+        'log_file': '/var/log/nxlog/nxlog.log',
+      },
+    },
+    'Windows': {
+      'package': 'nxlog',
+      'packages': [ ],
+      'service': 'nxlog',
+      'package_source': 'https://nxlog.co/system/files/products/files/348/nxlog-ce-2.9.1716.msi',
+      'log_file': '',
+      'user': '',
+      'group': '',
+      'locations': {
+        'config_file': 'C:\\Program Files (x86)\\nxlog\\conf\\nxlog.conf',
+        'log_file': 'C:\\Program Files (x86)\\nxlog\\data\\nxlog.log',
+      },
+    },
+  }, grain='os', default='default', merge=salt['pillar.get']('nxlog:lookup')) %}
+
+{% do default_settings.nxlog.lookup.update(os_map) %}
+
+{% set nxlog_settings = salt['pillar.get'](
+    'nxlog',
+    default=default_settings.nxlog,
+    merge=True,
+  )
 %}

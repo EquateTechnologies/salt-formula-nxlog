@@ -1,4 +1,0 @@
-nxlog:
-  lookup:
-    pkg: 'nxlog-ce'
-    service: 'nxlog'
